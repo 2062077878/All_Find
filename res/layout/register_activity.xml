@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:gravity="center"
+    android:background="@drawable/register_page"
+ 	android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin" >
+    
+    <LinearLayout 
+       android:layout_width="268dp"
+       android:layout_height="45dip"
+       android:layout_marginTop="30dip"
+       android:background="@drawable/txtborder"
+       android:orientation="horizontal"
+      >
+      <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+           android:layout_gravity="center_vertical"
+           android:textSize="18dp"
+           android:textColor="@android:color/holo_green_dark"
+          android:text="@string/username"
+          />
+       <EditText
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:id="@+id/username_edit"
+       android:ellipsize="end"  
+       android:maxLength="11"
+       android:paddingRight="2dp"
+       android:singleLine="true"
+       android:textAppearance="?android:attr/textAppearanceMedium"
+       android:textColorHighlight="#7e4d84" />
+  </LinearLayout>
+  
+    <LinearLayout 
+       android:layout_width="268dp"
+       android:layout_height="45dip"
+       android:layout_marginTop="30dip"
+       android:background="@drawable/txtborder"
+       android:orientation="horizontal"
+      >
+      <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+           android:textSize="18dp"
+           android:textColor="@android:color/holo_green_dark"
+          android:text="@string/password"
+          />
+       <EditText
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:id="@+id/password_edit"
+       android:ellipsize="end"  
+       android:maxLength="11"
+       android:paddingRight="2dp"
+       android:singleLine="true"
+       android:textAppearance="?android:attr/textAppearanceMedium"
+       android:textColorHighlight="#7e4d84" />
+  </LinearLayout>
+  
+    <LinearLayout 
+       android:layout_width="268dp"
+       android:layout_height="45dip"
+       android:layout_marginTop="30dip"
+       android:background="@drawable/txtborder"
+       android:orientation="horizontal"
+      >
+      <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+           android:layout_gravity="center_vertical"
+           android:textSize="18dp"
+           android:textColor="@android:color/holo_green_dark"
+          android:text="@string/repassword"
+          />
+       <EditText
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:id="@+id/password_reedit"
+       android:ellipsize="end"  
+       android:maxLength="11"
+       android:paddingRight="2dp"
+       android:singleLine="true"
+       android:textAppearance="?android:attr/textAppearanceMedium"
+       android:textColorHighlight="#7e4d84" />
+  </LinearLayout>
+  
+    <Button 
+       android:id="@+id/register_btn2"
+       android:layout_width="120dip"
+       android:layout_height="45dip"
+       android:gravity="center_horizontal"
+       android:layout_marginTop="30dip"
+       android:text="@string/register2"
+       android:textColor="@android:color/black"
+       android:background="@drawable/btn_border1"
+        />
+</LinearLayout>

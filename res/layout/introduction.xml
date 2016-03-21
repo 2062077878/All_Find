@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+     <ViewFlipper
+        android:id="@+id/viewflipper"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        />
+
+    <LinearLayout
+        android:id="@+id/ll_dot"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:paddingBottom="30dp" >
+
+        <ImageView
+            android:id="@+id/iv_1"
+            android:layout_width="20dp"
+            android:layout_height="20dp"          
+            android:src="@layout/point" />      //在point。xml中用一个boolean值选择要显示的图片
+
+        <ImageView
+            android:id="@+id/iv_2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@layout/point" />
+
+        <ImageView
+            android:id="@+id/iv_3"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@layout/point" />
+
+        <ImageView
+            android:id="@+id/iv_4"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@layout/point" />
+    </LinearLayout>
+    
+</FrameLayout>

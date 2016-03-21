@@ -1,0 +1,163 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PeripheralActivity"
+     android:background="@drawable/find_page" >
+    
+
+    <TableLayout
+        android:id="@+id/tableLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+         >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/peripheral_list_services_name"          
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                 android:gravity="center"
+                android:text="@string/laberName" />
+
+            <TextView
+                android:id="@+id/peripheral_name"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:textStyle="italic" />
+        </TableRow>
+
+
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/lable_text_view"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                 android:gravity="center"
+                android:text="@string/laberAddress" />
+
+            <TextView
+                android:id="@+id/peripheral_address"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:textStyle="italic" />
+        </TableRow>
+                
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                 android:gravity="center"
+                android:text="@string/connectionStatus" />
+
+            <TextView
+                android:id="@+id/peripheral_status"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:text="@string/disconnect"
+                android:textStyle="italic" />  
+          </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/lable_distance"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                 android:textSize="18sp"
+                  android:gravity="center"
+                android:text="@string/labledistance" />
+
+            <TextView
+                android:id="@+id/peripheral_rssi"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </TableRow>
+    
+        <TableRow
+            
+            android:id="@+id/tableRowmy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            
+       	<Button
+       	    android:id="@+id/set_distance"
+       	    android:layout_weight="1"
+       	    android:layout_height="wrap_content"
+       	    android:layout_gravity="center"
+       	    android:text="@string/setdistance"
+       	    android:gravity="center"
+       	     />
+	  	<Button
+       	    android:id="@+id/get_word"
+       	    android:layout_weight="1"
+       	    android:layout_height="wrap_content"
+       	    android:text="@string/getword"
+       	    android:gravity="center"
+       	     />
+       
+       	 </TableRow>
+
+
+       <TableRow> 
+       	 <Button
+       	    android:id="@+id/open_bear"
+       	    android:layout_weight="1"
+       	    android:layout_height="wrap_content"
+       	    android:layout_gravity="center"
+       	    android:text="@string/openbear"
+       	     />
+	  	<Button
+       	    android:id="@+id/close_bear"
+       	    android:layout_weight="1"
+       	    android:layout_height="wrap_content"
+       	    android:text="@string/closebear"
+       	     />
+        </TableRow>
+        
+    </TableLayout>
+
+     <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tableLayout1"
+        android:layout_below="@+id/tableLayout1"
+        android:layout_marginTop="20dp"
+        android:padding="2dp"
+ 		>
+		
+    </ListView> 
+
+
+</LinearLayout>

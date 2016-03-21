@@ -1,0 +1,42 @@
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"  
+     android:background="@drawable/login_page">
+
+    <Button 
+        android:id="@+id/bind_dervice"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="设备绑定解绑"/>
+    <Button 
+        android:id="@+id/put_word"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="发布留言"/>
+    <Button 
+        android:id="@+id/lose_flag"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="丢失标记"/>
+    <Button 
+        android:id="@+id/change_name"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="修改设备名"/>
+    <Button 
+        android:id="@+id/lose_list"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="丢失列表"/>
+    <Button 
+        android:id="@+id/find_location"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="定位信息"/>
+
+</LinearLayout>
+ 

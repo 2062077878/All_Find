@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<!-- 默认为true -->
+    <item android:drawable="@drawable/ball_grey" android:state_enabled="true"/>
+    <item android:drawable="@drawable/ball_red" android:state_enabled="false"/>
+
+</selector>
