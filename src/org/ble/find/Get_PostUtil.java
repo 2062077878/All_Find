@@ -122,16 +122,48 @@ public class Get_PostUtil {
 		return result;
 	}
 	
-	/* public Map<Object,Object> jsonToMapObject(String json){
-    Map<Object,Object> map = new HashMap<Object,Object>();//new一个map对象
-    String str = json.replace("{","").replace("}","").replaceAll("\"", "");//去掉大括号、双引号
-    String[] ary1 = str.split(",");//根据”,“号分隔字符串，获得数组对象
-    for(String s : ary1){//循环取出数组中的对象
-        String[] ary2 = s.split(":");//根据”:“冒号分隔字符串，获得键-值数组对象
-        map.put(ary2[0],ary2[1]);//将对象以键-值对的方式存入map中
-    }
-    return map;
-}*/
+	public static String sendPostret(String address,String param){
+		String str="";
+		try{
+			URL url=new URL(address+"?"+param); 
+			HttpURLConnection connection=(HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+			connection.setDoInput(true); // 向连接中写入数据
+			connection.setDoOutput(true); // 从连接中读取数据
+			connection.setUseCaches(false); // 禁止缓存
+			connection.setInstanceFollowRedirects(true);	//自动执行HTTP重定向
+			connection.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded"); // 设置内容类型
+			DataOutputStream out = new DataOutputStream(
+					connection.getOutputStream()); // 获取输出流
+			/*String param = "phone="
+					+ URLEncoder.encode(x, "utf-8")
+					+ "&password="
+					+ URLEncoder.encode(y, "utf-8");	//连接要提交的数据
+*/			out.writeBytes(param);//将要传递的数据写入数据输出流
+			out.flush();	//输出缓存
+			out.close();	//关闭数据输出流
+			// 判断是否响应成功
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				
+			}
+				InputStreamReader in = new InputStreamReader(
+						connection.getInputStream()); // 获得读取的内容
+				BufferedReader buffer = new BufferedReader(in); // 获取输入流对象
+				String inputLine = null;
+				while ((inputLine = buffer.readLine()) != null) {
+					 str = str+inputLine;
+				}
+				in.close();	//关闭字符输入流
+				connection.disconnect();	//断开连接
+		}         	                                                   //不需要返回数据~。~
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return str;
+	}
 public static String parseJSON(String jsonData,String str){
 String parsString="";
 try {
@@ -145,14 +177,21 @@ try {
 }
 return parsString;
 }
-@SuppressWarnings("null")
-public static String[] parseJSONArray(String jsonData,String armData){
-	String[] arm_data = null;
+
+
+//TODO 格式需要再修改
+public static String parseJSONArray(String jsonData,String armData){
+	String arm_data ="";
 	try {
-		JSONArray jsonArray=new JSONArray(jsonData);
+		JSONObject jsonObj=new JSONObject(jsonData);
+		JSONArray jsonArray=jsonObj.getJSONArray("name");
+
 		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject jsonObject = jsonArray.getJSONObject(i);
-			arm_data[i] = jsonObject.getString(armData);
+			//JSONObject jsonObject = jsonArray.getJSONObject(i);
+			JSONObject jsonObject =(JSONObject)jsonArray.opt(i);
+			arm_data =arm_data+","+ jsonObject.getString(armData);			
+			// JSONObject jsonObjectSon= (JSONObject)jsonArray.opt(i); 
+			//  str[i]=jsonObjectSon.getString("zhengshu")+"年份："+jsonObjectSon.getString("date");
 		}
 	} catch (JSONException e1) {	
 		e1.printStackTrace();

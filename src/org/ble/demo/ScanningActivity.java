@@ -99,11 +99,12 @@ public class ScanningActivity extends ListActivity {
 
 					@Override
            			public void run() {
-           				//获得设备名
-           				String deviceName=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/addressList", 
+           				//获得设备名          多个设备会有问题！！！！！！！！！
+           				String deviceName=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/userList", 
            						"address="+device.getAddress());	
            				Log.e("JSON数据", deviceName+"json");
-           				name=Get_PostUtil.parseJSON(deviceName, "name");  //获得设备名,这里是空空？？
+           				
+           				name=Get_PostUtil.parseJSON(deviceName, "name"); 
            				Log.e("解析","jiexi"+name);
            				Message message=new Message();
            				message.what=TRA_NAME;
@@ -182,8 +183,6 @@ public class ScanningActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.scanning_start:
-            	//mDevicesListAdapter = new DeviceListAdapter(this);  //
-                //setListAdapter(mDevicesListAdapter);                //另加的
             	mScanning = true;
             	mBleWrapper.startScanning();
                 break;
@@ -204,9 +203,11 @@ public class ScanningActivity extends ListActivity {
     			BluetoothDevice device1=(BluetoothDevice)msg.obj;
     			name = msg.getData().getString("Name");
     			byte[] record1=msg.getData().getByteArray("BY");
-    			int rssi1=msg.arg1;   			
-    			handleFoundDevice(device1,rssi1, record1,name);
+    			int rssi1=msg.arg1;  
+    			
+    			handleFoundDevice(device1,rssi1, record1,name);    //处理找到的设备
     			Log.e("终极", "zongji"+name);
+    			break;
     		}
     	}
     };
@@ -296,6 +297,7 @@ public class ScanningActivity extends ListActivity {
 							//请求绑定
 							Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
 									"phone="+mPhone+"&address="+device.getAddress()+"&name="+name+"&flag=1");
+							Log.e("bangding", "请求绑定"+postSussece);
 							Message message=new Message();
 						if(postSussece)	{							
 							message.what=BUND;

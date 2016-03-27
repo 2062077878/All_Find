@@ -6,7 +6,8 @@ import java.util.UUID;
 
 import org.ble.demo.R;
 import org.ble.find.Get_PostUtil;
-
+import org.ble.find.MainActivity;
+import org.ble.find.MyLocation;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,7 +38,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
     public static final String EXTRAS_DEVICE_ADDRESS = "BLE_DEVICE_ADDRESS";
     public static final String EXTRAS_DEVICE_RSSI    = "BLE_DEVICE_RSSI";
 	protected static final int GET_WORD = 1;
-
+	protected static final int LOCATION=2;
     
     public enum ListType {
     	GATT_SERVICES,
@@ -51,6 +52,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
     private String mDeviceRSSI;
 
     private BleWrapper mBleWrapper;
+  //  private MyLocation location;
     
     private TextView mDeviceNameView;
     private TextView mDeviceAddressView;
@@ -77,6 +79,10 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
     private double bearFlag=2.0;
     private int bearCount=0;
     private String responseWord;
+    
+	private MyLocation location;
+	public String return_Loc;
+
     /*设备已连接*/
    public void uiDeviceConnected(final BluetoothGatt gatt,
 			                      final BluetoothDevice device)
@@ -98,10 +104,21 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
    /*设备未连接*/
     public void uiDeviceDisconnected(final BluetoothGatt gatt,
 			                         final BluetoothDevice device)
-    {
-    	Log.e("标志", "22");
-    	// mCharacteristic = gatt.getService(SV_UUID).getCharacteristic(CR_UUID);  //获取特征值。。。不能在子线程里负值，否则会报空指针,有时要断开再连接才可以!!
-   // 	 setButtonView(false);
+    {  
+		Log.e("标志", "22");
+	  //将定位信息发布给服务器
+    	new Thread(new Runnable() {					
+
+			@Override
+			public void run() {
+			   return_Loc=location.getLocation(mDeviceAddress);
+				Message message=new Message();
+				message.what=LOCATION;
+				message.obj=return_Loc;
+				handler.sendMessage(message);
+			}
+		}).start();
+    	
     	runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -113,7 +130,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 				
 				invalidateOptionsMenu();
 				
-				mHeaderTitle.setText("");
+			//	mHeaderTitle.setText("");
 				mHeaderBackButton.setVisibility(View.INVISIBLE);
 				mListType = ListType.GATT_SERVICES;
 				mListView.setAdapter(mServicesListAdapter);
@@ -129,6 +146,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
     	runOnUiThread(new Runnable() {
 	    	@Override
 			public void run() {
+
 				double a=40.0;
 				double s=0.0000;
 				s=Math.pow(10, (-rssi-66)/a);    //rssi转为距离	
@@ -318,6 +336,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 			}
 		}     	
 	};
+
 	 
     
 	@Override
@@ -351,7 +370,13 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
         setDistance.setOnClickListener(this);
         getWord.setOnClickListener(this);
         openBear.setOnClickListener(this);
-        closeBear.setOnClickListener(this);
+        closeBear.setOnClickListener(this);        
+      //定位初始化
+        location=new MyLocation();
+       boolean isCanLoc = location.initLocation(PeripheralActivity.this);
+       if(!isCanLoc){
+    	   Toast.makeText(PeripheralActivity.this, "没有定位权限", Toast.LENGTH_LONG).show();
+       }
 	}
 	
 	@Override
@@ -370,7 +395,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 		mListView.setAdapter(mServicesListAdapter);
 		mListType = ListType.GATT_SERVICES;
 		mHeaderBackButton.setVisibility(View.INVISIBLE);
-		mHeaderTitle.setText("");
+	//	mHeaderTitle.setText("");
 		
 		// start automatically connecting to the device
     	//mDeviceStatus.setText("连接中 ...");
@@ -482,9 +507,10 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 				public void run() {
 			//		String word=Get_PostUtil.sendGet("http://10.0.2.2/get_word.json");  //根据设备标签获得留言  TODO 后一个参数mDeviceAddress
 				//TODO 地址和结构待改	
-					String word=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/addressList", 
+					String word=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/lostNote", 
 															"address="+mDeviceAddress);
-					setResponseWord(Get_PostUtil.parseJSON(word, "address"));  //解析数据返回"address:留言信息"
+					Log.e("返回留言", word);
+					setResponseWord(Get_PostUtil.parseJSON(word, "name"));  //解析数据返回"address:留言信息"
 					Message message=new Message();
 					message.what=GET_WORD;
 					handler.sendMessage(message);
@@ -503,8 +529,9 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 		}
 		
 	}
+
 	private Handler handler=new Handler(){
-			public void handleMessage(Message msg){
+			public void handleMessage(Message msg){			
 				switch(msg.what){
 					case GET_WORD:	
 						 AlertDialog.Builder builder2 = new Builder(PeripheralActivity.this);
@@ -518,6 +545,10 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 							}
 						});	
 						 builder2.show();
+						 break;
+					case LOCATION:
+						String loc=msg.obj.toString();
+						Toast.makeText(PeripheralActivity.this, "发送定位信息"+loc, Toast.LENGTH_SHORT).show();
 				}
 		}
 	};
@@ -563,5 +594,5 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 	public void setResponseWord(String responseWord) {
 		this.responseWord = responseWord;
 	}
-
+	
 }

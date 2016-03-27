@@ -10,8 +10,23 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_GPS"/>
+  
+    <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="ENOrcixzbRkEl28e8q1FnkmmMCtlonK9" />   
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="false" />
@@ -40,9 +55,10 @@
         </activity>
         <activity android:name="org.ble.find.IntroductionActivity" >
         </activity>
+        <activity android:name="org.ble.find.WebActivity" >
+        </activity>
          <activity
-            android:name="org.ble.find.UserSetActivity"
-            android:label="@string/title_activity_user_set" >
+            android:name="org.ble.find.UserSetActivity">
         </activity>
         <activity
             android:name="org.ble.demo.PeripheralActivity"

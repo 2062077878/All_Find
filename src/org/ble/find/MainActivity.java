@@ -1,6 +1,5 @@
 package org.ble.find;
 
-import org.ble.demo.PeripheralActivity;
 import org.ble.demo.R;
 import org.ble.demo.ScanningActivity;
 
@@ -62,6 +61,9 @@ public class MainActivity extends Activity {
 					userlogin.setVisibility(View.INVISIBLE);
 					Toast.makeText(MainActivity.this, "go to bbs", Toast.LENGTH_SHORT).show();
 					//TODO
+					Intent intent=new Intent(MainActivity.this,WebActivity.class);
+					intent.putExtra(WebActivity.EXTRA_WEB, "http://www.baidu.com");   //TODO进入论坛界面
+					startActivity(intent);
 				}else if (event.getAction()==MotionEvent.ACTION_UP){
 					
 				}

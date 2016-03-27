@@ -7,24 +7,31 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
 public class UserActivity extends Activity {
 
-	private TextView forget;
+//	private TextView forget;
+	private CheckBox remenberPsw;
 	private Button loginbtn,registerbtn;
 	private EditText phone,password;
-
+	
+	private SharedPreferences pref;
+	private SharedPreferences.Editor editor;
+	
 	public static final int SHOW_RESPONSE=0;
 	private ProgressDialog pd;
 	private void showProgressDialog() {
@@ -46,6 +53,17 @@ public class UserActivity extends Activity {
 				Log.e("解析字符串", arm_phone+"+"+arm_password);
 				if((phone.getText().toString().equals(arm_phone))&&(password.getText().toString().equals(arm_password))){
 					pd.dismiss();
+					//保存账号密码					
+					if(remenberPsw.isChecked()){
+						editor.putBoolean("remenber_password", true);
+					}else{
+						editor.clear();
+						editor.putBoolean("remenber_password", false);
+					}
+					editor.putString("account", phone.getText().toString());
+					editor.putString("psw", password.getText().toString());
+					editor.commit();
+					
 					Intent intent=new Intent(UserActivity.this,UserSetActivity.class);
 					//将账号和密码传过去
 					 Bundle bundle = new Bundle();  
@@ -59,7 +77,7 @@ public class UserActivity extends Activity {
 					 pd.dismiss();
 					 AlertDialog.Builder dialog  = new Builder(UserActivity.this);
 					 dialog.setTitle("提示" ) ;
-					 dialog.setMessage("密码错误！"+"\r\n"+"(可通过手机验证寻回密码)" ) ;
+					 dialog.setMessage("账号或密码错误!" ) ;
 					 dialog.setPositiveButton("确定" ,  null );
 					 dialog.show(); 
 				}
@@ -69,18 +87,70 @@ public class UserActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.userlogin_activity);
-		forget = (TextView) findViewById(R.id.forget);
+	//	forget = (TextView) findViewById(R.id.forget);
+		remenberPsw=(CheckBox)findViewById(R.id.remenber_pass);
 		registerbtn = (Button) findViewById(R.id.registerbtn);
 		loginbtn = (Button) findViewById(R.id.loginbtn);
 		phone = (EditText) findViewById(R.id.phone);
 		password = (EditText) findViewById(R.id.password);
-	/*找回密码*/	
-		forget.setOnTouchListener(new OnTouchListener() {
-			
+	/*记住密码*/	
+		pref=PreferenceManager.getDefaultSharedPreferences(this);
+		editor=pref.edit();
+		boolean isRemenber=pref.getBoolean("remenber_password", false);
+		if(isRemenber){
+			String account=pref.getString("account", "");
+			String psw=pref.getString("psw", "");
+			phone.setText(account);
+			password.setText(psw);
+			remenberPsw.setChecked(true);
+		}else{
+			String account=pref.getString("account", "");
+			phone.setText(account);
+			remenberPsw.setChecked(false);
+		}
+		/*登录*/
+		loginbtn.setOnClickListener(new OnClickListener() {			
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub  进入短信验证密码寻回页面
-				return false;
+			public void onClick(View v) {
+				showProgressDialog();
+				String account=phone.getText().toString();
+				String psw=password.getText().toString();
+				if((!account.equals(""))&&(!psw.equals(""))){					
+					if(account.equals(pref.getString("account", ""))&&psw.equals(pref.getString("psw", ""))){
+						pd.dismiss();
+						if(remenberPsw.isChecked()){
+							editor.putBoolean("remenber_password", true);
+						}else{
+							editor.putBoolean("remenber_password", false);
+						}
+						Intent intent=new Intent(UserActivity.this,UserSetActivity.class);
+						//将账号和密码传过去
+						 Bundle bundle = new Bundle();  
+						 bundle.putString("phone",phone.getText().toString());
+						 bundle.putString("password", password.getText().toString());
+						 intent.putExtras(bundle);
+						 startActivity(intent);
+						finish();
+					}
+					else{					
+						//到服务器找
+							new Thread(new Runnable() {									
+							@Override
+							public void run() {														
+								String respStr=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/loginmob", 
+										"phone="+phone.getText().toString()+"&password="+password.getText().toString());
+								Log.e("登录", respStr);		
+							//	String respStr=Get_PostUtil.sendGet("http://10.0.2.2/get_data.json");本地的试验
+								Message message=new Message();							
+								message.what=SHOW_RESPONSE;
+								message.obj=respStr;
+								handler.sendMessage(message);
+								         
+							}
+							
+						}).start();
+					}
+				}
 			}
 		});
 		/*注册*/
@@ -92,34 +162,6 @@ public class UserActivity extends Activity {
 				startActivity(intent);
 			}
 		});
-		/*登录*/
-		loginbtn.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				showProgressDialog();
-				if((!phone.getText().toString().equals(""))&&(!password.getText().toString().equals(""))){					
-					new Thread(new Runnable() {
-						
-						@Override
-						public void run() {							
-							
-							String respStr=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/loginmob", 
-									"phone="+phone.getText().toString()+"&password="+password.getText().toString());
-							Log.e("登录", respStr);		
-						//	String respStr=Get_PostUtil.sendGet("http://10.0.2.2/get_data.json");本地的试验
-							Message message=new Message();							
-							message.what=SHOW_RESPONSE;
-							message.obj=respStr;
-							handler.sendMessage(message);
-							         
-						}
-						
-					}).start();
-				}
-			}
-		});
-
 	}
 
 	protected void onResume() {
