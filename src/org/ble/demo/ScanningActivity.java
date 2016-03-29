@@ -1,6 +1,11 @@
 package org.ble.demo;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.ble.database.DeviceMsg;
+import org.ble.database.FindDBHandle;
 import org.ble.find.Get_PostUtil;
 import org.ble.find.UserSetActivity;
 
@@ -38,7 +43,9 @@ public class ScanningActivity extends ListActivity {
 	
 	public static final String EXTRAS_PHONE    = "EXTRAS_PHONE";  //区分是寻宝还是绑定设备
 	public static final String EXTRAS_NAME    = "EXTRAS_NAME";
+	public static final String EXTRAS_PASSWORD    = "EXTRAS_PASSWORD";
 	private String mPhone;
+	private String password;
 	private String name="UnKown";  //设备名
 	private boolean mScanning = false;
 	private Handler mHandler = new Handler();
@@ -46,11 +53,14 @@ public class ScanningActivity extends ListActivity {
 	private BleWrapper mBleWrapper = null;
 	private String changeName;	//改名称的标志
 
+	private FindDBHandle findDBHandle;
+	private DeviceMsg deviceMsg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);   
-        //setContentView(R.layout.activity_scanning_item);
-        
+        //setContentView(R.layout.activity_scanning_item);        //加上会出错！！！？？？
+        findDBHandle=FindDBHandle.getInstance(this);
+        deviceMsg=new DeviceMsg();
         // create BleWrapper with empty callback object except uiDeficeFound function (we need only that here) 
         mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null() {
         	@Override
@@ -71,14 +81,14 @@ public class ScanningActivity extends ListActivity {
         				
         			//	handleFoundDevice(device, rssi, record);
         			}
-        		}).start();*/
-        		
+        		}).start();*/       		
         	//	handleFoundDevice(device, rssi, record,name);
         	}
         });
         
         final Intent intent = getIntent();
         mPhone = intent.getStringExtra(EXTRAS_PHONE);
+        password=intent.getStringExtra(EXTRAS_PASSWORD);
         changeName=intent.getStringExtra(EXTRAS_NAME);     //扫描时没有传这个
         Log.e("电话", mPhone);
         Log.e("改名字", changeName);
@@ -92,6 +102,7 @@ public class ScanningActivity extends ListActivity {
     protected void onResume() {
     	super.onResume();
     	Log.e("onResume","resume");
+    	// findDBHandle=FindDBHandle.getInstance(this);
     	   mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null() {
            	@Override
            	public void uiDeviceFound(final BluetoothDevice device, final int rssi, final byte[] record) {
@@ -99,14 +110,18 @@ public class ScanningActivity extends ListActivity {
 
 					@Override
            			public void run() {
-           				//获得设备名          多个设备会有问题！！！！！！！！！
-           				String deviceName=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/userList", 
-           						"address="+device.getAddress());	
-           				Log.e("JSON数据", deviceName+"json");
-           				
-           				name=Get_PostUtil.parseJSON(deviceName, "name"); 
-           				Log.e("解析","jiexi"+name);
-           				Message message=new Message();
+						name=findDBHandle.queryDeviceAddress(device.getAddress());
+						if(!name.equals("No Name")){
+							Log.e("从本地获取设备名", name+"inDB");
+						}else{
+	           				String deviceName=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/userList", 
+	           						"address="+device.getAddress());	
+	           				Log.e("JSON数据", deviceName+"json");
+	           				
+	           				name=Get_PostUtil.parseJSON(deviceName, "name"); 
+	           				Log.e("解析","jiexi"+name);	           					     				
+						}
+						Message message=new Message();
            				message.what=TRA_NAME;
            				message.obj=device;
            				message.arg1=rssi;
@@ -115,8 +130,7 @@ public class ScanningActivity extends ListActivity {
                         bundle.putByteArray("BY", record);
                         message.setData(bundle);//mes利用Bundle传递数据  
            				handler2.sendMessage(message);
-           				Log.e("开始获取设备名", name+"onresume");			     				
-
+           				Log.e("开始获取设备名", name+"onresume");	
            			}
            		}).start();
            		
@@ -134,7 +148,8 @@ public class ScanningActivity extends ListActivity {
     	
     	// initialize BleWrapper object
         mBleWrapper.initialize();
-    	
+        getListView().setBackgroundResource(R.drawable.find_page);
+        
     	mDevicesListAdapter = new DeviceListAdapter(this);
         setListAdapter(mDevicesListAdapter);
     	
@@ -212,8 +227,7 @@ public class ScanningActivity extends ListActivity {
     	}
     };
     private Handler handler=new Handler(){
-	public void handleMessage(Message msg){
-		Intent intent=new Intent(ScanningActivity.this,UserSetActivity.class);
+	public void handleMessage(Message msg){		
 		switch(msg.what){
 		case BUND:
 			Toast.makeText(ScanningActivity.this, "绑定设备成功", Toast.LENGTH_SHORT).show();break;
@@ -229,6 +243,11 @@ public class ScanningActivity extends ListActivity {
 			Toast.makeText(ScanningActivity.this, "修改名称失败", Toast.LENGTH_SHORT).show();break;
 		default :break;
 		}
+		Intent intent=new Intent(ScanningActivity.this,UserSetActivity.class);
+		 Bundle bundle = new Bundle();  
+		 bundle.putString("phone",mPhone);
+		 bundle.putString("password", password);
+		 intent.putExtras(bundle);
 		startActivity(intent);
 	}
 };
@@ -236,6 +255,10 @@ public class ScanningActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         final BluetoothDevice device = mDevicesListAdapter.getDevice(position);
+        name= findDBHandle.queryDeviceAddress(device.getAddress());     //确定点击设备的名字
+        if(name.equals("No Name")){
+        	name=Get_PostUtil.parseJSON(device.getAddress(), "name");
+        }
         if (device == null) return;
         if(mPhone.compareTo("no")==0&&changeName.compareTo("no")==0){    //非登陆扫描
         	
@@ -259,16 +282,26 @@ public class ScanningActivity extends ListActivity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					name = newN.getText().toString();		
-				       //TODO 把新的名字传给服务器	
 					new Thread(new Runnable() {
 						
 						@Override
 						public void run() {
+							//修改到本地数据 设备名
+						   findDBHandle.updateDeviceMsg(device.getAddress(), name);
 							//修改设备名称
+						   String param="";
+						   try {
+								param = "phone="+URLEncoder.encode((mPhone),"utf-8")
+										+"&address="+URLEncoder.encode((device.getAddress()),"utf-8")
+										+"&name="+URLEncoder.encode((name),"utf-8");
+							} catch (UnsupportedEncodingException e) {
+								Log.e("参数", "异常"+e.toString());
+								e.printStackTrace();
+							}
 							Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
-									"phone="+mPhone+"&address="+device.getAddress()+"&name="+name+"&flag=2");
+									param+"&flag=2");
 							Message message=new Message();
-						if(postSussece)	{							
+						if(postSussece)	{	
 							message.what=CHANGE;
 							handler.sendMessage(message);
 							Log.e("对话框","改名成功");
@@ -294,6 +327,15 @@ public class ScanningActivity extends ListActivity {
 					new Thread(new Runnable() {					
 						@Override
 						public void run() {
+							//添加用户设备到本地数据库														
+							int userID = findDBHandle.getUserId(mPhone);     //有问题
+							if(userID!=0){
+								Log.e("获得userID","x"+userID);
+								deviceMsg.setUserId(userID);
+								deviceMsg.setDeviceName(name);
+								deviceMsg.setDeviceAddress(device.getAddress());
+								findDBHandle.addDeviceMsg(deviceMsg);
+							}
 							//请求绑定
 							Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
 									"phone="+mPhone+"&address="+device.getAddress()+"&name="+name+"&flag=1");
@@ -318,7 +360,8 @@ public class ScanningActivity extends ListActivity {
 					new Thread(new Runnable() {
 										
 						@Override
-						public void run() {
+						public void run() { 
+							findDBHandle.deleteDeviceMsg(device.getAddress());  //删除绑定设备
 						//请求解绑
 							Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
 											"phone="+mPhone+"&address="+device.getAddress()+"&name="+name+"&flag=0");

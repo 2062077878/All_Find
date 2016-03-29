@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,12 +25,17 @@ public class Get_PostUtil {
 		try{
 			URL url=new URL(address+"?"+param);   //TODO怎么访问待商榷
 			connection=(HttpURLConnection) url.openConnection();
+			connection.setRequestProperty("contentType", "utf-8");  
+			connection.setRequestProperty("accept", "*/*");
+			connection.setRequestProperty("connection", "Keep-Alive");
+			connection.setRequestProperty("user-agent",
+				"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
 			connection.setRequestMethod("GET");
 			connection.setConnectTimeout(8000);
 			connection.setReadTimeout(8000);		
 			
 			InputStream in=connection.getInputStream();
-			BufferedReader reader=new BufferedReader(new InputStreamReader(in));
+			BufferedReader reader=new BufferedReader(new InputStreamReader(in,"utf-8"));   //in,"utf-8"
 			StringBuilder response=new StringBuilder();
 			String line;
 			while((line=reader.readLine())!=null){
@@ -50,8 +56,17 @@ public class Get_PostUtil {
 	public static boolean sendPost(String address,String param){
 		Boolean flag=false;
 		try{
-			URL url=new URL(address+"?"+param); 
+			//String str=address+"?"+param;
+			//str = URLEncoder.encode(str, "utf-8");
+			//URL url=new URL(address);
+			URL url=new URL(address+"?"+param); 		    
 			HttpURLConnection connection=(HttpURLConnection) url.openConnection();
+			/*connection.setRequestProperty("accept", "/*");
+			connection.setRequestProperty("connection", "Keep-Alive");
+			connection.setRequestProperty("user-agent",
+				"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
+			connection.setRequestProperty("Content-Type",
+					"utf-8");*/
 			connection.setRequestMethod("POST");
 			connection.setDoInput(true); // 向连接中写入数据
 			connection.setDoOutput(true); // 从连接中读取数据
@@ -59,6 +74,8 @@ public class Get_PostUtil {
 			connection.setInstanceFollowRedirects(true);	//自动执行HTTP重定向
 			connection.setRequestProperty("Content-Type",
 					"application/x-www-form-urlencoded"); // 设置内容类型
+			/*connection.setRequestProperty("Content-Type",
+					"utf-8");*/
 			DataOutputStream out = new DataOutputStream(
 					connection.getOutputStream()); // 获取输出流
 			/*String param = "phone="
@@ -99,6 +116,10 @@ public class Get_PostUtil {
 		try{
 			URL url=new URL(address);   //TODO怎么访问待商榷
 			connection=(HttpURLConnection) url.openConnection();
+			connection.setRequestProperty("accept", "*/*"); 
+			connection.setRequestProperty("connection", "Keep-Alive");
+			connection.setRequestProperty("user-agent",
+				"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)");
 			connection.setRequestMethod("GET");
 			connection.setConnectTimeout(8000);
 			connection.setReadTimeout(8000);		
@@ -136,7 +157,7 @@ public class Get_PostUtil {
 					"application/x-www-form-urlencoded"); // 设置内容类型
 			DataOutputStream out = new DataOutputStream(
 					connection.getOutputStream()); // 获取输出流
-			/*String param = "phone="
+		/*	String param = "phone="
 					+ URLEncoder.encode(x, "utf-8")
 					+ "&password="
 					+ URLEncoder.encode(y, "utf-8");	//连接要提交的数据

@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
 					Intent intent=new Intent(MainActivity.this,ScanningActivity.class);
 					intent.putExtra(ScanningActivity.EXTRAS_PHONE,"no");
 					intent.putExtra(ScanningActivity.EXTRAS_NAME,"no");
+					intent.putExtra(ScanningActivity.EXTRAS_PASSWORD,"no");
 					startActivity(intent);
 				}else if (event.getAction()==MotionEvent.ACTION_UP){
 					

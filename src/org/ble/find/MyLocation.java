@@ -74,9 +74,9 @@ public class MyLocation {
 					final StringBuilder loc = new StringBuilder();
 					loc.append(myLocation.getLatitude()).append(",").append(myLocation.getLongitude());  //经纬度				
 							//地址待改，把此时地位信息发至服务端
-							/* boolean loction = Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
+							 boolean loction = Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/location", 
 	           						"address="+mDeviceAddress+"&location="+loc.toString());	
-							if(loction) Log.e("loction",loc.toString());*/
+							if(loction) Log.e("loction",loc.toString());
 							Log.e("loction","loc"+loc.toString());
 							return loc.toString();
 					
