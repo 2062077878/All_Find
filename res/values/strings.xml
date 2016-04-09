@@ -36,11 +36,11 @@
      <string name="openbear">开启警报</string>
      
      <!-- 登录后的界面-->
-    <string name="facebook">标记丢失</string>
-    <string name="twitter">查看丢失列表</string>
-    <string name="google">发布留言</string>
-    <string name="linkedin">修改名称</string>
-    <string name="wordpress">用户设置</string>
-    <string name="myspace">查看定位信息</string>
+    <string name="lostflag">标记丢失</string>
+    <string name="mylost">查看丢失列表</string>
+    <string name="putword">发布留言</string>
+    <string name="changname">修改名称</string>
+    <string name="bandaddress">绑定设备</string>
+    <string name="setlocation">查看定位信息</string>
 
 </resources>

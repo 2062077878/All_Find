@@ -65,24 +65,7 @@ public class ScanningActivity extends ListActivity {
         mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null() {
         	@Override
         	public void uiDeviceFound(final BluetoothDevice device, final int rssi, final byte[] record) {
-        		/*new Thread(new Runnable() {
-        			
-        			@Override
-        			public void run() {
-        				//获得设备名
-        				String deviceName=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/addressList", 
-        						"address="+device.getAddress());			
-        				String get_name=Get_PostUtil.parseJSON(deviceName, "name");  //获得设备名
-        				Message message=new Message();
-        				message.what=TRA_NAME;
-        				message.obj=get_name;
-        				handler2.sendMessage(message);
-        				Log.e("开始获取设备名", get_name+"oncreate");		     				
-        				
-        			//	handleFoundDevice(device, rssi, record);
-        			}
-        		}).start();*/       		
-        	//	handleFoundDevice(device, rssi, record,name);
+        		
         	}
         });
         
@@ -116,10 +99,9 @@ public class ScanningActivity extends ListActivity {
 						}else{
 	           				String deviceName=Get_PostUtil.sendGet("http://youfoundme.sinaapp.com/auth/userList", 
 	           						"address="+device.getAddress());	
-	           				Log.e("JSON数据", deviceName+"json");
-	           				
+	           				Log.e("JSON数据", deviceName+"json");	           				
 	           				name=Get_PostUtil.parseJSON(deviceName, "name"); 
-	           				Log.e("解析","jiexi"+name);	           					     				
+	           				
 						}
 						Message message=new Message();
            				message.what=TRA_NAME;
@@ -218,8 +200,7 @@ public class ScanningActivity extends ListActivity {
     			BluetoothDevice device1=(BluetoothDevice)msg.obj;
     			name = msg.getData().getString("Name");
     			byte[] record1=msg.getData().getByteArray("BY");
-    			int rssi1=msg.arg1;  
-    			
+    			int rssi1=msg.arg1;     			
     			handleFoundDevice(device1,rssi1, record1,name);    //处理找到的设备
     			Log.e("终极", "zongji"+name);
     			break;
@@ -288,29 +269,28 @@ public class ScanningActivity extends ListActivity {
 						public void run() {
 							//修改到本地数据 设备名
 						   findDBHandle.updateDeviceMsg(device.getAddress(), name);
-							//修改设备名称
-						   String param="";
+							//修改设备名称						  
 						   try {
-								param = "phone="+URLEncoder.encode((mPhone),"utf-8")
+								String param = "phone="+URLEncoder.encode((mPhone),"utf-8")
 										+"&address="+URLEncoder.encode((device.getAddress()),"utf-8")
 										+"&name="+URLEncoder.encode((name),"utf-8");
+								Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
+										param+"&flag=2");
+									Message message=new Message();
+								if(postSussece)	{	
+									message.what=CHANGE;
+									handler.sendMessage(message);
+									Log.e("对话框","改名成功");
+								}else{
+									message.what=DISCHANGE;
+									handler.sendMessage(message);
+									Log.e("对话框","改名失败");
+								}
+							
 							} catch (UnsupportedEncodingException e) {
 								Log.e("参数", "异常"+e.toString());
 								e.printStackTrace();
-							}
-							Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
-									param+"&flag=2");
-							Message message=new Message();
-						if(postSussece)	{	
-							message.what=CHANGE;
-							handler.sendMessage(message);
-							Log.e("对话框","改名成功");
-						}else{
-							message.what=DISCHANGE;
-							handler.sendMessage(message);
-							Log.e("对话框","改名失败");
-						}
-						
+							}						
 						}
 					}).start();
 				}
@@ -337,18 +317,27 @@ public class ScanningActivity extends ListActivity {
 								findDBHandle.addDeviceMsg(deviceMsg);
 							}
 							//请求绑定
-							Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
-									"phone="+mPhone+"&address="+device.getAddress()+"&name="+name+"&flag=1");
-							Log.e("bangding", "请求绑定"+postSussece);
-							Message message=new Message();
-						if(postSussece)	{							
-							message.what=BUND;
-							handler.sendMessage(message);
-						}else{
-							message.what=BUND_FAILE;
-							handler.sendMessage(message);				
-						}
-						
+							try {
+								String param = "phone="+URLEncoder.encode((mPhone),"utf-8")
+										+"&address="+URLEncoder.encode((device.getAddress()),"utf-8")
+										+"&name="+URLEncoder.encode((name),"utf-8");
+										
+								Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
+										param+"&flag=1");
+								Log.e("bangding", "请求绑定"+postSussece);
+								Message message=new Message();
+							if(postSussece)	{							
+								message.what=BUND;
+								handler.sendMessage(message);
+							}else{
+								message.what=BUND_FAILE;
+								handler.sendMessage(message);				
+							}
+							} catch (UnsupportedEncodingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+								
 						}
 					}).start();
 					Log.e("对话框","绑定");
@@ -363,8 +352,12 @@ public class ScanningActivity extends ListActivity {
 						public void run() { 
 							findDBHandle.deleteDeviceMsg(device.getAddress());  //删除绑定设备
 						//请求解绑
-							Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
-											"phone="+mPhone+"&address="+device.getAddress()+"&name="+name+"&flag=0");
+							try {
+								String param = "phone="+URLEncoder.encode((mPhone),"utf-8")
+										+"&address="+URLEncoder.encode((device.getAddress()),"utf-8")
+										+"&name="+URLEncoder.encode((name),"utf-8");
+								Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/userList", 
+										param+"&flag=0");
 							Message message=new Message();
 							if(postSussece){
 									message.what=UNBUND;
@@ -373,6 +366,10 @@ public class ScanningActivity extends ListActivity {
 									message.what=UNBUND_FAILE;
 									handler.sendMessage(message);				
 								}					
+							} catch (UnsupportedEncodingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}							
 							}
 						}).start();				
 					Log.e("对话框","解绑");

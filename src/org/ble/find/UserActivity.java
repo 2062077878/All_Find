@@ -66,6 +66,10 @@ public class UserActivity extends Activity {
 					editor.putString("account", phone.getText().toString());
 					editor.putString("psw", password.getText().toString());
 					editor.commit();*/
+					UserMsg userMsg=new UserMsg();
+					userMsg.setUserName(arm_phone);
+					userMsg.setPassword(arm_password);
+					findDBHandle.addUserMsg(userMsg);  //添加进本地数据库
 					
 					Intent intent=new Intent(UserActivity.this,UserSetActivity.class);
 					//将账号和密码传过去
@@ -135,6 +139,7 @@ public class UserActivity extends Activity {
 						Log.e("用户信息查询", name);
 						if(name.equals(account)){  
 							Intent intent=new Intent(UserActivity.this,UserSetActivity.class);
+							//Intent intent=new Intent(UserActivity.this,User_SetActivity.class);							
 							//将账号和密码传过去
 							 Bundle bundle = new Bundle();  
 							 bundle.putString("phone",phone.getText().toString());

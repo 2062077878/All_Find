@@ -1,5 +1,7 @@
 package org.ble.demo;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -9,6 +11,7 @@ import org.ble.find.Get_PostUtil;
 import org.ble.find.MainActivity;
 import org.ble.find.MyLocation;
 
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -91,6 +94,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 	 	// mCharacteristic = gatt.getService(SV_UUID).getCharacteristic(CR_UUID);  //写在这里会死掉？？？？
 	     //setButtonView(true);
 	   //  Log.e("标志", "yyy");
+	   //要开启后台服务？？
 	   	 runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -107,17 +111,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
     {  
 		Log.e("标志", "22");
 	  //将定位信息发布给服务器
-    	new Thread(new Runnable() {					
-
-			@Override
-			public void run() {
-			   return_Loc=location.getLocation(mDeviceAddress);
-				Message message=new Message();
-				message.what=LOCATION;
-				message.obj=return_Loc;
-				handler.sendMessage(message);
-			}
-		}).start();
+    	
     	
     	runOnUiThread(new Runnable() {
 			@Override
@@ -154,7 +148,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 				if(s>bearFlag){
 					bearCount++;
 				}
-				if(bearCount>=4){
+				if(bearCount>=3){
 					bearCount=0;
 					bear(1);
 				}
@@ -265,7 +259,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 			@Override
 			public void run() {
 				//Toast.makeText(getApplicationContext(), "Writing to " + description + " was finished successfully!", Toast.LENGTH_LONG).show();
-				Toast.makeText(getApplicationContext(), "警报指令发生成功", Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), "警报指令发生成功", Toast.LENGTH_SHORT).show();
 					Log.e("标志", "88");
 					
 				}
@@ -282,7 +276,7 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 			@Override
 			public void run() {
 				//Toast.makeText(getApplicationContext(), "Writing to " + description + " FAILED!", Toast.LENGTH_LONG).show();
-				Toast.makeText(getApplicationContext(), "警报指令未能发出", Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), "警报指令未能发出", Toast.LENGTH_SHORT).show();
 			}
 		});	
 	}
@@ -403,19 +397,6 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
  
 	};
 	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		mServicesListAdapter.clearList();
-		mCharacteristicsListAdapter.clearList();
-		mCharDetailsAdapter.clearCharacteristic();
-		
-		
-		mBleWrapper.stopMonitoringRssiValue();
-		mBleWrapper.diconnect();
-		mBleWrapper.close();
-	};
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -547,8 +528,9 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 						 builder2.show();
 						 break;
 					case LOCATION:
-						String loc=msg.obj.toString();
-						Toast.makeText(PeripheralActivity.this, "发送定位信息"+loc, Toast.LENGTH_SHORT).show();
+						String loc=msg.obj.toString();	
+						Log.e("反馈","发送定位信息"+loc);
+						//Toast.makeText(PeripheralActivity.this, "发送定位信息"+loc, Toast.LENGTH_SHORT).show();
 				}
 		}
 	};
@@ -595,4 +577,62 @@ public class PeripheralActivity extends Activity implements BleWrapperUiCallback
 		this.responseWord = responseWord;
 	}
 	
+	@Override
+	protected void onPause() {		
+		super.onPause();
+		Log.e("onPause", "pause");
+	};
+
+	protected void onStop(){
+		super.onStop();
+		Log.e("onStop", "stop");
+	}
+	protected void onDestroy(){	
+		new Thread(new Runnable() {					
+			@Override
+			public void run() {
+			   return_Loc=location.getLocation(mDeviceAddress);
+			   parseTheLocation(return_Loc);				
+			}
+			private void parseTheLocation(String location) {
+				try {					
+					String[] loc = location.split(",");
+					double lat = Double.parseDouble(loc[0]);
+					double lng = Double.parseDouble(loc[1]);
+					Geocoder geo=new Geocoder(getApplicationContext());
+					List<android.location.Address> str=geo.getFromLocation(lat,lng,0);
+
+					String result=str.get(0).toString();						
+					result=result.substring(result.indexOf("\""), result.indexOf(","));  //根据结果划分的
+					 String param="";
+					   try {
+							param = "address="+URLEncoder.encode((mDeviceAddress),"utf-8")
+									+"&location="+URLEncoder.encode((result),"utf-8");								
+						} catch (UnsupportedEncodingException e) {
+							Log.e("参数", "异常"+e.toString());
+							e.printStackTrace();
+						}
+					 boolean loction = Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/location", 
+							 param);	
+					if(loction) Log.e("解析位置",result);
+					
+					Message message=new Message();
+					message.what=LOCATION;
+					message.obj=result;
+					handler.sendMessage(message);
+				} catch (Exception e) {
+					 Log.e("异常",e.toString());
+					e.printStackTrace();
+				}
+			}
+		}).start();
+		mServicesListAdapter.clearList();
+		mCharacteristicsListAdapter.clearList();
+		mCharDetailsAdapter.clearCharacteristic();		
+		mBleWrapper.stopMonitoringRssiValue();
+		mBleWrapper.diconnect();
+		mBleWrapper.close();                 //原本在onpause，黑屏就断了
+		Log.e("onDestroy", "destroy");		
+		super.onDestroy();
+	}
 }

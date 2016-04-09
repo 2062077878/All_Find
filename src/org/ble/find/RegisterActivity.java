@@ -1,5 +1,7 @@
 package org.ble.find;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import org.ble.demo.R;
@@ -62,13 +64,20 @@ public class RegisterActivity extends Activity {
 								userMsg.setUserName(username);
 								userMsg.setPassword(password);
 								findDBHandle.addUserMsg(userMsg);  //Ìí¼Ó½ø±¾µØÊý¾Ý¿â
-								//ÍøÂç×¢²á							
-								  Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/resmob", 
-											"phone="+username+"&password="+password);
-								  if(postSussece)							
-									Log.d("ÃÜÂë", password);
-								msg.what=SUCCESE;
-								handler.sendMessage(msg);
+								//ÍøÂç×¢²á									
+								try {
+									String param = "phone="+URLEncoder.encode((username),"utf-8")
+											+"&password="+URLEncoder.encode((password),"utf-8");
+									  Boolean postSussece=Get_PostUtil.sendPost("http://youfoundme.sinaapp.com/auth/resmob", 
+											  param);
+									  if(postSussece)							
+										Log.d("ÃÜÂë", password);
+									msg.what=SUCCESE;
+									handler.sendMessage(msg);
+								} catch (UnsupportedEncodingException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}					
 							}
 						
 						}

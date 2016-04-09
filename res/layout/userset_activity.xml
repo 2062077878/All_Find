@@ -1,0 +1,71 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:circle="http://schemas.android.com/apk/res/org.ble.demo"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_page"
+    tools:context=".MainActivity" >
+
+    <org.ble.find.CircleLayout
+        android:id="@+id/main_circle_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal"
+        circle:firstChildPosition="South"
+        circle:isRotating="true"
+        circle:rotateToCenter="true" >
+
+        <!-- circle:circleBackground="@drawable/green"  > -->
+
+        <org.ble.find.CircleImageView
+            android:id="@+id/main_facebook_image"
+            circle:name="@string/lostflag"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/icon_lost" />
+
+        <org.ble.find.CircleImageView
+            android:id="@+id/main_myspace_image"
+            circle:name="@string/setlocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_location" />
+
+        <org.ble.find.CircleImageView
+            android:id="@+id/main_google_image"
+            circle:name="@string/putword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_putword" />
+
+        <org.ble.find.CircleImageView
+            android:id="@+id/main_linkedin_image"
+            circle:name="@string/changname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_changename" />
+
+        <org.ble.find.CircleImageView
+            android:id="@+id/main_twitter_image"
+            circle:name="@string/mylost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_mylost" />
+
+        <org.ble.find.CircleImageView
+            android:id="@+id/main_wordpress_image"
+            circle:name="@string/bandaddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_band" />
+    </org.ble.find.CircleLayout>
+    <TextView 
+        android:id="@+id/text"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:textSize="25sp"
+        android:paddingTop="10sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

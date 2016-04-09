@@ -63,7 +63,7 @@ public class MainActivity extends Activity {
 					Toast.makeText(MainActivity.this, "go to bbs", Toast.LENGTH_SHORT).show();
 					//TODO
 					Intent intent=new Intent(MainActivity.this,WebActivity.class);
-					intent.putExtra(WebActivity.EXTRA_WEB, "http://www.baidu.com");   //TODO进入论坛界面
+					intent.putExtra(WebActivity.EXTRA_WEB, "http://youfoundme.sinaapp.com/forum/mainboard");   //TODO进入论坛界面
 					startActivity(intent);
 				}else if (event.getAction()==MotionEvent.ACTION_UP){
 					

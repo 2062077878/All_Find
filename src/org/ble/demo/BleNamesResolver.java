@@ -1,6 +1,7 @@
 package org.ble.demo;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import android.util.SparseArray;
 
@@ -83,6 +84,7 @@ public class BleNamesResolver {
 		mServices.put("00001814-0000-1000-8000-00805f9b34fb", "Running Speed and Cadence");
 		mServices.put("00001813-0000-1000-8000-00805f9b34fb", "Scan Parameters");
 		mServices.put("00001804-0000-1000-8000-00805f9b34fb", "Tx Power");
+		mServices.put("0000fff0-0000-1000-8000-00805f9b34fb","All_Find");	  
 		
 		mCharacteristics.put("00002a43-0000-1000-8000-00805f9b34fb", "Alert Category ID");
 		mCharacteristics.put("00002a42-0000-1000-8000-00805f9b34fb", "Alert Category ID Bit Mask");
@@ -165,6 +167,7 @@ public class BleNamesResolver {
 		mCharacteristics.put("00002a0e-0000-1000-8000-00805f9b34fb", "Time Zone");
 		mCharacteristics.put("00002a07-0000-1000-8000-00805f9b34fb", "Tx Power Level");
 		mCharacteristics.put("00002a45-0000-1000-8000-00805f9b34fb", "Unread Alert Status");
+		mCharacteristics.put("0000fff1-0000-1000-8000-00805f9b34fb","All Find");
 		
 		mValueFormats.put(Integer.valueOf(52), "32bit float");
 		mValueFormats.put(Integer.valueOf(50), "16bit float");

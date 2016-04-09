@@ -60,6 +60,9 @@
          <activity
             android:name="org.ble.find.UserSetActivity">
         </activity>
+         <activity
+            android:name="org.ble.find.User_SetActivity">
+        </activity>
         <activity
             android:name="org.ble.demo.PeripheralActivity"
             android:label="@string/title_activity_peripheral"
